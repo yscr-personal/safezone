@@ -1,11 +1,8 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:unb/common/bloc/auth/auth_bloc.dart';
-import 'package:unb/common/environment_config.dart';
 import 'package:unb/common/guards/auth_guard.dart';
 import 'package:unb/common/interfaces/i_http_service.dart';
-import 'package:unb/common/services/dio_http_service.dart';
 import 'package:unb/common/storage/user_preferences.dart';
 import 'package:unb/modules/auth/auth_module.dart';
 import 'package:unb/modules/home/home_module.dart';
@@ -15,27 +12,18 @@ class AppModule extends Module {
   final UserPreferences userPreferences;
   final SharedPreferences sharedPreferences;
   final AuthBloc authBloc;
+  final IHttpService httpService;
 
   AppModule({
     required this.userPreferences,
     required this.sharedPreferences,
     required this.authBloc,
+    required this.httpService,
   });
 
   @override
   List<Bind> get binds => [
-        Bind(
-          (i) => Dio(
-            BaseOptions(
-              baseUrl: EnvironmentConfig.BACKEND_URL,
-              connectTimeout: 5000,
-              receiveTimeout: 3000,
-              contentType: 'application/json',
-              validateStatus: (status) => status! < 500,
-            ),
-          ),
-        ),
-        Bind<IHttpService>((i) => DioHttpService(i())),
+        Bind<IHttpService>((i) => httpService),
         Bind((i) => sharedPreferences),
         Bind((i) => userPreferences),
         Bind((i) => authBloc),

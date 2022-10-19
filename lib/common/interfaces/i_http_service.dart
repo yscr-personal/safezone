@@ -1,25 +1,23 @@
-import 'package:dio/dio.dart';
-
 abstract class IHttpService {
-  Future<Response<T>> get<T>(
+  Future get(
     String url, {
     Map<String, String>? headers,
     Map<String, String>? queryParameters,
   });
 
-  Future<Response<T>> post<T>(
+  Future post(
     String url, {
     Map<String, String>? headers,
     dynamic body,
   });
 
-  Future<Response<T>> put<T>(
+  Future put(
     String url, {
     Map<String, String>? headers,
     dynamic body,
   });
 
-  Future<Response<T>> delete<T>(
+  Future delete(
     String url, {
     Map<String, String>? headers,
   });

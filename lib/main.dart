@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:unb/common/bloc/auth/auth_bloc.dart';
+import 'package:unb/common/interfaces/i_http_service.dart';
+import 'package:unb/common/services/dio_http_service.dart';
 import 'package:unb/common/storage/user_preferences.dart';
 import 'package:unb/main_module.dart';
 import 'package:unb/main_widget.dart';
@@ -17,7 +19,8 @@ void main() async {
 
   final sharedPreferences = await SharedPreferences.getInstance();
   final userPreferences = UserPreferences(sharedPreferences);
-  final authBloc = AuthBloc(userPreferences);
+  final IHttpService dioHttpService = DioHttpService();
+  final authBloc = AuthBloc(userPreferences, dioHttpService);
 
   return runApp(
     ModularApp(
@@ -25,6 +28,7 @@ void main() async {
         userPreferences: userPreferences,
         sharedPreferences: sharedPreferences,
         authBloc: authBloc,
+        httpService: dioHttpService,
       ),
       child: MultiBlocProvider(
         providers: [

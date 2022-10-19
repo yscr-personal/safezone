@@ -8,6 +8,13 @@ class AuthGuard extends RouteGuard {
 
   @override
   Future<bool> canActivate(String path, ModularRoute route) {
-    return Future.value(authBloc.state is AuthInitial);
+    bool ok = authBloc.state is AuthLoaded;
+    if (ok) {
+      final AuthLoaded state = authBloc.state as AuthLoaded;
+      ok = state.user.id != '';
+    }
+
+    print('[AuthGuard] - Allow access to $path: $ok');
+    return Future.value(ok);
   }
 }
