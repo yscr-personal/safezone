@@ -1,0 +1,9 @@
+environment_config:
+  path: common/environment_config.dart
+  dotenv_path: .env
+  class: EnvironmentConfig
+
+  fields:
+    BACKEND_URL:
+      dotenv: true
+      default: <REQUIRED>
