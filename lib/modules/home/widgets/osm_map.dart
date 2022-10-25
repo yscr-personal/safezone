@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
@@ -17,10 +19,19 @@ class _OsmMapState extends State<OsmMap> {
   final _mapController = MapController();
   final _geoService = Modular.get<GeolocationService>();
 
+  final _centerCurrentLocationStreamController = StreamController<double?>();
+  var _centerOnLocationUpdate = CenterOnLocationUpdate.always;
+
   @override
   void initState() {
     super.initState();
     _geoService.init();
+  }
+
+  @override
+  void dispose() {
+    _centerCurrentLocationStreamController.close();
+    super.dispose();
   }
 
   @override
@@ -33,6 +44,13 @@ class _OsmMapState extends State<OsmMap> {
             final pos = await _geoService.determinePosition();
             _mapController.move(LatLng(pos.latitude, pos.longitude), 18);
           },
+          onPositionChanged: (MapPosition position, bool hasGesture) {
+            if (hasGesture) {
+              setState(
+                () => _centerOnLocationUpdate = CenterOnLocationUpdate.never,
+              );
+            }
+          },
         ),
         nonRotatedChildren: [
           Positioned(
@@ -40,8 +58,10 @@ class _OsmMapState extends State<OsmMap> {
             bottom: 20,
             child: FloatingActionButton(
               onPressed: () async {
-                final pos = await _geoService.determinePosition();
-                _mapController.move(LatLng(pos.latitude, pos.longitude), 18);
+                setState(
+                  () => _centerOnLocationUpdate = CenterOnLocationUpdate.always,
+                );
+                _centerCurrentLocationStreamController.add(18);
               },
               child: const Icon(
                 Icons.my_location,
@@ -57,7 +77,11 @@ class _OsmMapState extends State<OsmMap> {
             userAgentPackageName: 'br.com.unb.safezone',
             maxZoom: 19,
           ),
-          CurrentLocationLayer(),
+          CurrentLocationLayer(
+            centerOnLocationUpdate: _centerOnLocationUpdate,
+            centerCurrentLocationStream:
+                _centerCurrentLocationStreamController.stream,
+          ),
           MarkerClusterLayerWidget(
             options: MarkerClusterLayerOptions(
               builder: (context, markers) {

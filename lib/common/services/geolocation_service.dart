@@ -5,34 +5,33 @@ import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
 
 class GeolocationService {
-  late Stream<Position> positionStream;
-  final logger = Modular.get<Logger>();
+  late Stream<Position> _positionStream;
+  final _logger = Modular.get<Logger>();
 
   Future<Position> determinePosition() async {
     return await Geolocator.getCurrentPosition();
   }
 
-  void init() async {
-    watchPosition();
-    watchLocationStatus();
+  void init({
+    void Function(Position position)? onLocationUpdate,
+  }) async {
+    _watchPosition(onLocationUpdate);
   }
 
-  void watchPosition() async {
-    positionStream = Geolocator.getPositionStream(
+  void _watchPosition(
+      void Function(Position position)? onLocationUpdate) async {
+    _positionStream = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.bestForNavigation,
         distanceFilter: 10,
       ),
     );
 
-    positionStream.listen((Position position) {
-      logger.d('${position.latitude}, ${position.longitude}');
-    });
-  }
-
-  void watchLocationStatus() {
-    Geolocator.getServiceStatusStream().listen((final status) {
-      logger.d(status);
+    _positionStream.listen((final Position position) {
+      _logger.d('lat=${position.latitude}, lng=${position.longitude}');
+      if (onLocationUpdate != null) {
+        onLocationUpdate(position);
+      }
     });
   }
 }

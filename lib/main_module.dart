@@ -31,8 +31,8 @@ class AppModule extends Module {
           '/home',
           module: HomeModule(),
           guards: [
-            AuthGuard(),
             GeoGuard(),
+            AuthGuard(),
           ],
         ),
         ModuleRoute('/auth', module: AuthModule()),
