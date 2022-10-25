@@ -17,3 +17,12 @@ class AuthLoaded extends AuthState {
   @override
   List<Object> get props => [user];
 }
+
+class AuthFailed extends AuthState {
+  final String message;
+
+  const AuthFailed({this.message = 'Authentication failed'});
+
+  @override
+  List<Object> get props => [message];
+}

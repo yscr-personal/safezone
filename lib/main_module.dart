@@ -1,38 +1,40 @@
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:unb/common/bloc/auth/auth_bloc.dart';
 import 'package:unb/common/guards/auth_guard.dart';
-import 'package:unb/common/interfaces/i_http_service.dart';
-import 'package:unb/common/storage/user_preferences.dart';
+import 'package:unb/common/guards/geo_guard.dart';
+import 'package:unb/common/modules/core_module.dart';
+import 'package:unb/common/modules/no_location_enabled/no_location_module.dart';
+import 'package:unb/common/modules/splash/splash_module.dart';
 import 'package:unb/modules/auth/auth_module.dart';
 import 'package:unb/modules/home/home_module.dart';
-import 'package:unb/modules/loading/loading_screen.dart';
 
 class AppModule extends Module {
-  final UserPreferences userPreferences;
-  final SharedPreferences sharedPreferences;
   final AuthBloc authBloc;
-  final IHttpService httpService;
 
   AppModule({
-    required this.userPreferences,
-    required this.sharedPreferences,
     required this.authBloc,
-    required this.httpService,
   });
 
   @override
-  List<Bind> get binds => [
-        Bind<IHttpService>((i) => httpService),
-        Bind((i) => sharedPreferences),
-        Bind((i) => userPreferences),
-        Bind((i) => authBloc),
+  List<Module> get imports => [
+        CoreModule(authBloc),
       ];
 
   @override
   List<ModularRoute> get routes => [
-        ChildRoute('/', child: (_, args) => const LoadingScreen()),
-        ModuleRoute('/home', module: HomeModule(), guards: [AuthGuard()]),
+        ModuleRoute('/', module: SplashModule()),
+        ModuleRoute(
+          '/no_location',
+          module: NoLocationServiceModule(),
+        ),
+        ModuleRoute(
+          '/home',
+          module: HomeModule(),
+          guards: [
+            AuthGuard(),
+            GeoGuard(),
+          ],
+        ),
         ModuleRoute('/auth', module: AuthModule()),
       ];
 }

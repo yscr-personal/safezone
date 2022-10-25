@@ -7,7 +7,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BaseScreenLayout(
+    return const BaseScreenLayout(
       child: OsmMap(),
     );
   }

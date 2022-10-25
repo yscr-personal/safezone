@@ -13,15 +13,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   AuthBloc(this._userPreferences, this._httpService) : super(AuthInitial()) {
     on<LoadUserTokenEvent>((event, emit) async {
-      final token = _userPreferences.token;
+      final token = await _userPreferences.token;
       if (token == null) {
-        emit(AuthInitial());
+        emit(const AuthFailed(message: 'Token not found'));
         return;
       }
 
       final userJson = await _httpService.get('/users/$token');
       if (userJson == null) {
-        emit(AuthInitial());
+        emit(const AuthFailed(message: 'Failed to fetch user'));
         return;
       }
 
@@ -29,16 +29,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoaded(user: user));
     });
     on<LoginEvent>((event, emit) async {
-      if (state is AuthLoaded) {
-        await _userPreferences.saveToken(event.user);
-        emit(AuthLoaded(user: event.user));
+      final id = '${event.email}@${event.password}'.hashCode % 10;
+      final userJson = await _httpService.get('/users/$id');
+      if (userJson == null) {
+        emit(const AuthFailed(message: 'Failed to fetch user'));
+        return;
       }
+      final user = UserModel.fromJson(userJson);
+      await _userPreferences.saveToken(user);
+      emit(AuthLoaded(user: user));
     });
     on<LogoutEvent>((event, emit) {
-      if (state is AuthLoaded) {
-        _userPreferences.deleteToken();
-        emit(AuthInitial());
-      }
+      _userPreferences.deleteToken();
+      emit(AuthInitial());
     });
   }
 }

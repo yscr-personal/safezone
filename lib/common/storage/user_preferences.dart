@@ -4,17 +4,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:unb/common/models/user_model.dart';
 
 class UserPreferences {
-  final SharedPreferences _sharedPreferences;
-
-  const UserPreferences(this._sharedPreferences);
-
   Future<void> saveToken(final UserModel user) async {
-    await _sharedPreferences.setString("token", user.id);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString("token", user.id);
   }
 
-  String? get token => _sharedPreferences.getString("token");
+  Future<String?> get token async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString("token");
+  }
 
   Future<void> deleteToken() async {
-    await _sharedPreferences.remove("token");
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove("token");
   }
 }
