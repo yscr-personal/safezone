@@ -23,10 +23,8 @@ void main() async {
   return runApp(
     ModularApp(
       module: AppModule(authCubit: authCubit),
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider(create: (_) => authCubit..tryToLoadUserFromStorage()),
-        ],
+      child: BlocProvider.value(
+        value: authCubit..tryToLoadUserFromStorage(),
         child: const AppWidget(),
       ),
     ),

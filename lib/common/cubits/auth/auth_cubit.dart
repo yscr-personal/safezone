@@ -1,15 +1,14 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:unb/common/business_exception.dart';
 import 'package:unb/common/interfaces/i_http_service.dart';
 import 'package:unb/common/models/user_model.dart';
 import 'package:unb/common/storage/user_preferences.dart';
 
 part 'auth_state.dart';
 
-class AuthException implements Exception {
-  final String message;
-
-  const AuthException(this.message);
+class AuthException extends BusinessException {
+  const AuthException(super.message);
 }
 
 class AuthCubit extends Cubit<AuthState> {
