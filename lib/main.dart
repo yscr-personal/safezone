@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:unb/common/bloc/auth/auth_cubit.dart';
+import 'package:unb/common/cubits/auth/auth_cubit.dart';
 import 'package:unb/common/interfaces/i_http_service.dart';
 import 'package:unb/common/services/dio_http_service.dart';
 import 'package:unb/common/storage/user_preferences.dart';

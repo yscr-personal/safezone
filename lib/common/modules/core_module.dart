@@ -1,6 +1,6 @@
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:logger/logger.dart';
-import 'package:unb/common/bloc/auth/auth_cubit.dart';
+import 'package:unb/common/cubits/auth/auth_cubit.dart';
 import 'package:unb/common/services/dio_http_service.dart';
 import 'package:unb/common/storage/user_preferences.dart';
 

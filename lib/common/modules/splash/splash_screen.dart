@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:logger/logger.dart';
-import 'package:unb/common/bloc/auth/auth_cubit.dart';
+import 'package:unb/common/cubits/auth/auth_cubit.dart';
 import 'package:unb/common/widgets/base_screen_layout.dart';
 import 'package:unb/common/widgets/loading_indicator.dart';
 

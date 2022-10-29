@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:unb/common/bloc/auth/auth_cubit.dart';
+import 'package:unb/common/cubits/auth/auth_cubit.dart';
 
 class BaseScreenLayout extends StatelessWidget {
   final _authCubit = Modular.get<AuthCubit>();
