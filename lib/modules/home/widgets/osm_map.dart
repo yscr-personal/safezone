@@ -30,17 +30,7 @@ class _OsmMapState extends State<OsmMap> {
   @override
   void initState() {
     super.initState();
-
-    _groupCubit.fetchGroup().then((value) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        final pos = await _geoService.determinePosition();
-        _mapController.move(LatLng(pos.latitude, pos.longitude), 18);
-      });
-    });
-
-    _geoService.init(onLocationUpdate: (position) {
-      _logger.i('sending (${position.latitude}, ${position.longitude}) to SQS');
-    });
+    _groupCubit.fetchGroup();
   }
 
   @override
@@ -75,6 +65,12 @@ class _OsmMapState extends State<OsmMap> {
               () => _centerOnLocationUpdate = CenterOnLocationUpdate.never,
             );
           }
+        },
+        onMapReady: () async {
+          _logger.i('[OSM] map ready');
+          final pos = await _geoService.determinePosition();
+          _mapController.move(LatLng(pos.latitude, pos.longitude), 19);
+          _geoService.init();
         },
       ),
       nonRotatedChildren: [

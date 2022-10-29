@@ -5,7 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
 
 class GeolocationService {
-  late Stream<Position> _positionStream;
+  Stream<Position>? _positionStream;
   final _logger = Modular.get<Logger>();
 
   Future<Position> determinePosition() async {
@@ -19,6 +19,11 @@ class GeolocationService {
   }
 
   void _watchPosition(void Function(Position position)? onLocationUpdate) {
+    if (_positionStream != null) {
+      return;
+    }
+
+    _logger.i('initializing geolocation service');
     _positionStream = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.bestForNavigation,
@@ -26,7 +31,7 @@ class GeolocationService {
       ),
     );
 
-    _positionStream.listen((final Position position) {
+    _positionStream!.listen((final Position position) {
       _logger.d(
           '[${DateTime.now().toString()}] lat=${position.latitude}, lng=${position.longitude}');
       if (onLocationUpdate != null) {
