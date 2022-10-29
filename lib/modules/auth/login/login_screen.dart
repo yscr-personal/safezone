@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:unb/common/bloc/auth/auth_bloc.dart';
 import 'package:unb/common/widgets/base_screen_layout.dart';
+import 'package:unb/modules/auth/login/login_controller.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,7 +12,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final AuthBloc authBloc = Modular.get();
+  final LoginController _loginController = Modular.get();
   var _email = '';
   var _password = '';
 
@@ -75,9 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
-                      authBloc.add(
-                        LoginEvent(email: _email, password: _password),
-                      );
+                      _loginController.authenticateUser(_email, _password);
                     }
                   },
                   child: const Text(

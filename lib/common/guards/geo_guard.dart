@@ -9,7 +9,7 @@ class GeoGuard extends RouteGuard {
 
   @override
   Future<bool> canActivate(String path, ModularRoute route) async {
-    bool ok = await _isLocationAvailable();
+    final ok = await _isLocationAvailable();
     logger.i('[GeoGuard] - Allow access to $path: $ok');
     return Future.value(ok);
   }

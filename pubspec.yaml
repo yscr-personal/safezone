@@ -40,7 +40,6 @@ dependencies:
   latlong2: ^0.8.1
   flutter_map_location_marker: ^5.0.0+1
   geolocator: ^9.0.2
-  flutter_compass: ^0.7.0
   flutter_modular: ^5.0.3
   provider: ^6.0.4
   http: ^0.13.5
@@ -50,7 +49,6 @@ dependencies:
   equatable: ^2.0.5
   flutter_bloc: ^8.1.1
   pretty_dio_logger: ^1.2.0-beta-1
-  flutter_map_marker_cluster: ^1.0.1
   logger: ^1.1.0
 
 dev_dependencies:

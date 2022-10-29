@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
-import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:logger/logger.dart';
+import 'package:unb/common/interfaces/i_http_service.dart';
 import 'package:unb/common/services/geolocation_service.dart';
 
 class OsmMap extends StatefulWidget {
@@ -18,14 +19,42 @@ class OsmMap extends StatefulWidget {
 class _OsmMapState extends State<OsmMap> {
   final _mapController = MapController();
   final _geoService = Modular.get<GeolocationService>();
+  final _logger = Modular.get<Logger>();
+  final _httpService = Modular.get<IHttpService>();
 
   final _centerCurrentLocationStreamController = StreamController<double?>();
   var _centerOnLocationUpdate = CenterOnLocationUpdate.always;
+  var _markers = <Marker>[];
 
   @override
   void initState() {
     super.initState();
-    _geoService.init();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final pos = await _geoService.determinePosition();
+      _mapController.move(LatLng(pos.latitude, pos.longitude), 18);
+    });
+
+    _geoService.init(onLocationUpdate: (position) {
+      _logger.i('sending (${position.latitude}, ${position.longitude}) to SQS');
+    });
+
+    _httpService.get('/users').then(
+      (value) {
+        final markers = (value as List<dynamic>).map<Marker>(
+          (element) => Marker(
+            point: LatLng(
+              double.parse(element['address']['geo']['lat']),
+              double.parse(element['address']['geo']['lng']),
+            ),
+            builder: (ctx) => const Icon(Icons.location_history),
+          ),
+        );
+        setState(
+          () => _markers = markers.toList(),
+        );
+      },
+    );
   }
 
   @override
@@ -40,10 +69,9 @@ class _OsmMapState extends State<OsmMap> {
       child: FlutterMap(
         mapController: _mapController,
         options: MapOptions(
-          onMapReady: () async {
-            final pos = await _geoService.determinePosition();
-            _mapController.move(LatLng(pos.latitude, pos.longitude), 18);
-          },
+          minZoom: 3,
+          maxZoom: 19,
+          interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
           onPositionChanged: (MapPosition position, bool hasGesture) {
             if (hasGesture) {
               setState(
@@ -57,7 +85,7 @@ class _OsmMapState extends State<OsmMap> {
             right: 20,
             bottom: 20,
             child: FloatingActionButton(
-              onPressed: () async {
+              onPressed: () {
                 setState(
                   () => _centerOnLocationUpdate = CenterOnLocationUpdate.always,
                 );
@@ -76,29 +104,17 @@ class _OsmMapState extends State<OsmMap> {
             subdomains: const ['a', 'b', 'c'],
             userAgentPackageName: 'br.com.unb.safezone',
             maxZoom: 19,
+            minZoom: 3,
+            maxNativeZoom: 19,
+            minNativeZoom: 3,
           ),
           CurrentLocationLayer(
             centerOnLocationUpdate: _centerOnLocationUpdate,
             centerCurrentLocationStream:
                 _centerCurrentLocationStreamController.stream,
           ),
-          MarkerClusterLayerWidget(
-            options: MarkerClusterLayerOptions(
-              builder: (context, markers) {
-                return Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.red,
-                  ),
-                  child: Center(
-                    child: Text(
-                      markers.length.toString(),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                );
-              },
-            ),
+          MarkerLayer(
+            markers: _markers,
           ),
         ],
       ),

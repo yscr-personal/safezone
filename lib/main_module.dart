@@ -1,5 +1,5 @@
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:unb/common/bloc/auth/auth_bloc.dart';
+import 'package:unb/common/bloc/auth/auth_cubit.dart';
 import 'package:unb/common/guards/auth_guard.dart';
 import 'package:unb/common/guards/geo_guard.dart';
 import 'package:unb/common/modules/core_module.dart';
@@ -9,15 +9,15 @@ import 'package:unb/modules/auth/auth_module.dart';
 import 'package:unb/modules/home/home_module.dart';
 
 class AppModule extends Module {
-  final AuthBloc authBloc;
+  final AuthCubit authCubit;
 
   AppModule({
-    required this.authBloc,
+    required this.authCubit,
   });
 
   @override
   List<Module> get imports => [
-        CoreModule(authBloc),
+        CoreModule(authCubit),
       ];
 
   @override
