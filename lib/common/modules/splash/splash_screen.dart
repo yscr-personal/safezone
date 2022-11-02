@@ -21,7 +21,9 @@ class SplashScreen extends StatelessWidget {
               Future.delayed(
                 const Duration(seconds: 2),
                 () => Modular.to.pushReplacementNamed(
-                  (state as AuthLoaded).user.id == '' ? '/auth/' : '/home/',
+                  (state as AuthLoaded).user.username == ''
+                      ? '/auth/'
+                      : '/home/',
                 ),
               );
               break;

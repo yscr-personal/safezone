@@ -53,10 +53,7 @@ class _OsmMapState extends State<OsmMap> {
   }
 
   _buildMap(final GroupLoaded state) {
-    final group = state.group.where(
-      (member) => member != (_authCubit.state as AuthLoaded).user,
-    );
-    final markers = group
+    final markers = state.group
         .map(
           (member) => Marker(
             point: LatLng(

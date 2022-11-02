@@ -23,6 +23,7 @@ class AppModule extends Module {
   @override
   List<ModularRoute> get routes => [
         ModuleRoute('/', module: SplashModule()),
+        // ModuleRoute('/', module: TodosModule()),
         ModuleRoute(
           '/no_location',
           module: NoLocationServiceModule(),

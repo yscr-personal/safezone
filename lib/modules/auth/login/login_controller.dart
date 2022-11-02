@@ -1,14 +1,23 @@
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:unb/common/cubits/auth/auth_cubit.dart';
+import 'package:logger/logger.dart';
 
 class LoginController {
-  final AuthCubit _authCubit = Modular.get();
+  final _logger = Modular.get<Logger>();
 
-  void authenticateUser(
-    final String email,
-    final String password,
-  ) async {
-    await _authCubit.login(email, password);
-    Modular.to.pushReplacementNamed('/home/');
+  Future<bool> signInUser(final String username, final String password) async {
+    _logger.i('[LoginController] - signInUser: $username');
+    try {
+      final result = await Amplify.Auth.signIn(
+        username: username,
+        password: password,
+      );
+
+      return result.isSignedIn;
+    } on AuthException catch (e) {
+      _logger.e(e.message);
+    }
+
+    return false;
   }
 }

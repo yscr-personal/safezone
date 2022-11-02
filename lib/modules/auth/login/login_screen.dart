@@ -11,8 +11,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final LoginController _loginController = Modular.get();
+  final _formKey = GlobalKey<FormState>();
+  final _loginController = Modular.get<LoginController>();
   var _email = '';
   var _password = '';
 
@@ -75,7 +75,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
-                      _loginController.authenticateUser(_email, _password);
+                      final valid =
+                          await _loginController.signInUser(_email, _password);
+                      if (valid) {
+                        Modular.to.pushReplacementNamed('/home/');
+                      }
                     }
                   },
                   child: const Text(
@@ -92,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Text('Not registered yet?'),
                     TextButton(
                       onPressed: () {
-                        Modular.to.pushNamed('/auth/signup');
+                        Modular.to.pushNamed('/auth/signup/');
                       },
                       child: const Text('Create an account'),
                     ),
