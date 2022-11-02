@@ -6,7 +6,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:unb/common/cubits/auth/auth_cubit.dart';
 import 'package:unb/common/cubits/group/group_cubit.dart';
 import 'package:unb/common/services/geolocation_service.dart';
 import 'package:unb/common/widgets/loading_indicator.dart';
@@ -22,7 +21,6 @@ class _OsmMapState extends State<OsmMap> {
   final _mapController = MapController();
   final _geoService = Modular.get<GeolocationService>();
   final _groupCubit = Modular.get<GroupCubit>();
-  final _authCubit = Modular.get<AuthCubit>();
 
   final _centerCurrentLocationStreamController = StreamController<double?>();
   var _centerOnLocationUpdate = CenterOnLocationUpdate.always;

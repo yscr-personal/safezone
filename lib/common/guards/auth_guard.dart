@@ -1,9 +1,10 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:logger/logger.dart';
+import 'package:unb/common/interfaces/i_auth_service.dart';
 
 class AuthGuard extends RouteGuard {
   final _logger = Modular.get<Logger>();
+  final _authService = Modular.get<IAuthService>();
 
   AuthGuard() : super(redirectTo: '/auth/');
 
@@ -15,11 +16,6 @@ class AuthGuard extends RouteGuard {
   }
 
   Future<bool> _isLoggedIn() async {
-    try {
-      final session = await Amplify.Auth.fetchAuthSession();
-      return session.isSignedIn;
-    } catch (e) {
-      return false;
-    }
+    return await _authService.fetchSession();
   }
 }

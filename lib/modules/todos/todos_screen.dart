@@ -32,14 +32,6 @@ class _TodosScreenState extends State<TodosScreen> {
     _subscription.cancel();
   }
 
-  Future<void> _login() async {
-    SignInResult res = await Amplify.Auth.signIn(
-      username: 'yserka.98@gmail.com',
-      password: 'Yuri261098!',
-    );
-    print(res);
-  }
-
   Future<void> _configureApp() async {
     await _configureAmplify();
     _subscription = Amplify.DataStore.observeQuery(Todo.classType)

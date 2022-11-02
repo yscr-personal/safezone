@@ -1,5 +1,4 @@
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:unb/common/cubits/auth/auth_cubit.dart';
 import 'package:unb/common/guards/auth_guard.dart';
 import 'package:unb/common/guards/geo_guard.dart';
 import 'package:unb/common/modules/core_module.dart';
@@ -9,16 +8,10 @@ import 'package:unb/modules/auth/auth_module.dart';
 import 'package:unb/modules/home/home_module.dart';
 
 class AppModule extends Module {
-  final AuthCubit authCubit;
-
-  AppModule({
-    required this.authCubit,
-  });
+  AppModule();
 
   @override
-  List<Module> get imports => [
-        CoreModule(authCubit),
-      ];
+  List<Module> get imports => [CoreModule()];
 
   @override
   List<ModularRoute> get routes => [

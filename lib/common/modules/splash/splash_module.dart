@@ -7,6 +7,6 @@ class SplashModule extends Module {
 
   @override
   List<ModularRoute> get routes => [
-        ChildRoute('/', child: (context, args) => SplashScreen()),
+        ChildRoute('/', child: (context, args) => const SplashScreen()),
       ];
 }

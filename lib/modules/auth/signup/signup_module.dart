@@ -13,7 +13,7 @@ class SignUpModule extends Module {
         ChildRoute(
           '/confirm-code',
           child: (_, args) => ConfirmationCodeScreen(
-            email: args.queryParams['email'],
+            username: args.queryParams['username'],
           ),
         ),
       ];

@@ -121,7 +121,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       );
                       if (valid) {
                         Modular.to.pushReplacementNamed(
-                            '/auth/signup/confirm-code?email=$_email');
+                            '/auth/signup/confirm-code?username=$_email');
                       }
                     }
                   },

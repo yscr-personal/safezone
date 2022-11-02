@@ -20,9 +20,9 @@ class DioHttpService implements IHttpService {
 
   @override
   Future get(
-    String url, {
-    Map<String, String>? headers,
-    Map<String, String>? queryParameters,
+    final String url, {
+    final Map<String, String>? headers,
+    final Map<String, String>? queryParameters,
   }) async {
     final response = await _dio.get(
       url,
@@ -39,9 +39,9 @@ class DioHttpService implements IHttpService {
 
   @override
   Future post(
-    String url, {
-    Map<String, String>? headers,
-    body,
+    final String url, {
+    final Map<String, String>? headers,
+    final body,
   }) async {
     final response = await _dio.post(
       url,
@@ -58,9 +58,9 @@ class DioHttpService implements IHttpService {
 
   @override
   Future put(
-    String url, {
-    Map<String, String>? headers,
-    body,
+    final String url, {
+    final Map<String, String>? headers,
+    final body,
   }) async {
     final response = await _dio.put(
       url,
@@ -77,8 +77,8 @@ class DioHttpService implements IHttpService {
 
   @override
   Future delete(
-    String url, {
-    Map<String, String>? headers,
+    final String url, {
+    final Map<String, String>? headers,
   }) async {
     final response = await _dio.delete(
       url,

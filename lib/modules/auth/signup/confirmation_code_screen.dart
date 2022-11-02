@@ -5,9 +5,9 @@ import 'package:unb/common/widgets/base_screen_layout.dart';
 import 'package:unb/modules/auth/signup/signup_controller.dart';
 
 class ConfirmationCodeScreen extends StatefulWidget {
-  final String? email;
+  final String? username;
 
-  const ConfirmationCodeScreen({super.key, this.email});
+  const ConfirmationCodeScreen({super.key, this.username});
 
   @override
   State<ConfirmationCodeScreen> createState() => _ConfirmationCodeScreenState();
@@ -77,7 +77,7 @@ class _ConfirmationCodeScreenState extends State<ConfirmationCodeScreen> {
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     final valid = await _controller.confirmUser(
-                      widget.email!,
+                      widget.username!,
                       _codeController.text,
                     );
                     if (valid) {
