@@ -15,7 +15,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   AuthCubit({required this.authService}) : super(AuthInitial());
 
-  Future<void> tryToLoadUserFromStorage() async {
+  Future<void> tryToHotLoadUser() async {
     emit(AuthLoading());
     try {
       final hasSession = await authService.fetchSession();

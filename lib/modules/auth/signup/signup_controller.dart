@@ -11,7 +11,7 @@ class SignupController {
     final String password,
   ) async {
     try {
-      return await _authService.register(email, password, rememberDevice: true);
+      return await _authService.register(email, password);
     } catch (e) {
       _logger.e(e.toString());
     }

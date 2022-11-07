@@ -7,7 +7,7 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:unb/common/cubits/group/group_cubit.dart';
-import 'package:unb/common/services/geolocation_service.dart';
+import 'package:unb/common/interfaces/i_geolocation_service.dart';
 import 'package:unb/common/widgets/loading_indicator.dart';
 
 class OsmMap extends StatefulWidget {
@@ -19,7 +19,7 @@ class OsmMap extends StatefulWidget {
 
 class _OsmMapState extends State<OsmMap> {
   final _mapController = MapController();
-  final _geoService = Modular.get<GeolocationService>();
+  final _geoService = Modular.get<IGeolocationService>();
   final _groupCubit = Modular.get<GroupCubit>();
 
   final _centerCurrentLocationStreamController = StreamController<double?>();
@@ -83,9 +83,9 @@ class _OsmMapState extends State<OsmMap> {
           }
         },
         onMapReady: () async {
-          final pos = await _geoService.determinePosition();
+          final pos = await _geoService.getCurrentLocation();
           _mapController.move(LatLng(pos.latitude, pos.longitude), 19);
-          _geoService.init();
+          _geoService.startLocationTracking();
         },
       ),
       nonRotatedChildren: [

@@ -16,6 +16,6 @@ class AuthGuard extends RouteGuard {
   }
 
   Future<bool> _isLoggedIn() async {
-    return await _authService.fetchSession();
+    return await _authService.isLogged();
   }
 }

@@ -26,11 +26,7 @@ class AwsAuthService implements IAuthService {
   }
 
   @override
-  Future<bool> register(
-    final String username,
-    final String password, {
-    final bool rememberDevice = true,
-  }) async {
+  Future<bool> register(final String username, final String password) async {
     final result = await Amplify.Auth.signUp(
       username: username,
       password: password,
@@ -65,5 +61,10 @@ class AwsAuthService implements IAuthService {
   @override
   Future<AuthUser> fetchCurrentUser() async {
     return await Amplify.Auth.getCurrentUser();
+  }
+
+  @override
+  Future<bool> isLogged() {
+    return fetchSession();
   }
 }
