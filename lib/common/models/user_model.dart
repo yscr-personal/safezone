@@ -33,30 +33,36 @@ class UserModel extends Equatable {
   final String id;
   final String? name;
   final String? email;
+  final String? avatarUrl;
   final UserAddressModel? address;
 
   const UserModel({
     required this.id,
     this.name,
     this.email,
+    this.avatarUrl,
     this.address,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-        id: json['id'].toString(),
-        name: json['name'],
-        email: json['email'],
-        address: UserAddressModel(
-          street: json['address']['street'],
-          suite: json['address']['suite'],
-          city: json['address']['city'],
-          zipcode: json['address']['zipcode'],
-          geo: UserAddressGeoModel(
-            lat: json['address']['geo']['lat'],
-            lng: json['address']['geo']['lng'],
-          ),
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    final strId = json['id'].toString();
+    return UserModel(
+      id: strId,
+      name: json['name'],
+      email: json['email'],
+      avatarUrl: 'https://picsum.photos/id/${int.parse(strId) * 100}/200',
+      address: UserAddressModel(
+        street: json['address']['street'],
+        suite: json['address']['suite'],
+        city: json['address']['city'],
+        zipcode: json['address']['zipcode'],
+        geo: UserAddressGeoModel(
+          lat: json['address']['geo']['lat'],
+          lng: json['address']['geo']['lng'],
         ),
-      );
+      ),
+    );
+  }
 
   factory UserModel.empty() => const UserModel(id: '');
 
@@ -64,6 +70,7 @@ class UserModel extends Equatable {
         'id': id,
         'name': name,
         'email': email,
+        'avatarUrl': avatarUrl,
         'address': {
           'street': address?.street,
           'suite': address?.suite,

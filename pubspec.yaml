@@ -56,6 +56,7 @@ dependencies:
   amplify_datastore: ^0.6.9
   amplify_api: ^0.6.9
   modular_bloc_bind: ^1.0.1
+  sliding_up_panel: ^2.0.0+1
 
 dev_dependencies:
   flutter_test:

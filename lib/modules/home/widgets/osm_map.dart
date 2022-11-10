@@ -20,16 +20,9 @@ class OsmMap extends StatefulWidget {
 class _OsmMapState extends State<OsmMap> {
   final _mapController = MapController();
   final _geoService = Modular.get<IGeolocationService>();
-  final _groupCubit = Modular.get<GroupCubit>();
 
   final _centerCurrentLocationStreamController = StreamController<double?>();
   var _centerOnLocationUpdate = CenterOnLocationUpdate.always;
-
-  @override
-  void initState() {
-    super.initState();
-    _groupCubit.fetchGroup();
-  }
 
   @override
   void dispose() {
@@ -61,9 +54,7 @@ class _OsmMapState extends State<OsmMap> {
             height: 40,
             width: 40,
             builder: (ctx) => CircleAvatar(
-              backgroundImage: NetworkImage(
-                'https://picsum.photos/id/${int.parse(member.id) * 100}/200',
-              ),
+              backgroundImage: NetworkImage(member.avatarUrl!),
             ),
           ),
         )
@@ -90,9 +81,14 @@ class _OsmMapState extends State<OsmMap> {
       ),
       nonRotatedChildren: [
         Positioned(
-          right: 20,
-          bottom: 20,
+          right: 5,
+          top: 20,
           child: FloatingActionButton(
+            backgroundColor: Colors.grey.shade800,
+            mini: true,
+            shape: BeveledRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
             onPressed: () {
               setState(
                 () => _centerOnLocationUpdate = CenterOnLocationUpdate.always,
@@ -101,7 +97,7 @@ class _OsmMapState extends State<OsmMap> {
             },
             child: const Icon(
               Icons.my_location,
-              color: Colors.white,
+              color: Colors.blue,
             ),
           ),
         ),
