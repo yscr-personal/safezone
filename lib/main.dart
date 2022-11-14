@@ -5,9 +5,11 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:unb/amplifyconfiguration.dart';
 import 'package:unb/app_module.dart';
 import 'package:unb/app_widget.dart';
+import 'package:unb/common/environment_config.dart';
 import 'package:unb/common/models/amplify/ModelProvider.dart';
 
 Future<void> _configureAmplify() async {
@@ -23,7 +25,7 @@ Future<void> _configureAmplify() async {
   }
 }
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitDown,
@@ -32,10 +34,21 @@ void main() async {
 
   await _configureAmplify();
 
-  return runApp(
-    ModularApp(
-      module: AppModule(),
-      child: const AppWidget(),
+  await SentryFlutter.init(
+    (options) {
+      options.dsn =
+          'https://12e65a9fce4246f79e6a369842b3e78d@o4504154891485184.ingest.sentry.io/4504154892664832';
+      // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+      // We recommend adjusting this value in production.
+      options.tracesSampleRate = 1.0;
+      options.enableAutoSessionTracking = true;
+      options.environment = EnvironmentConfig.ENV;
+    },
+    appRunner: () => runApp(
+      ModularApp(
+        module: AppModule(),
+        child: const AppWidget(),
+      ),
     ),
   );
 }

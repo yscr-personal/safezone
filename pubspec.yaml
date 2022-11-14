@@ -57,6 +57,7 @@ dependencies:
   amplify_api: ^0.6.9
   modular_bloc_bind: ^1.0.1
   sliding_up_panel: ^2.0.0+1
+  sentry_flutter: ^6.15.1
 
 dev_dependencies:
   flutter_test:
