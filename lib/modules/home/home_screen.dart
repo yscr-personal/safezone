@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
@@ -16,11 +18,22 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _groupCubit = Modular.get<GroupCubit>();
+  Timer? timer;
 
   @override
   void initState() {
     super.initState();
     _groupCubit.fetchGroup();
+    timer = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) => _groupCubit.updateGroupLocation(),
+    );
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 
   @override

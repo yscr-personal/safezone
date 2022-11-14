@@ -6,7 +6,7 @@ import 'package:logger/logger.dart';
 import 'package:unb/common/interfaces/i_geolocation_service.dart';
 
 class GeolocationService implements IGeolocationService {
-  late StreamSubscription<Position>? _positionStream;
+  StreamSubscription<Position>? _positionStream;
   final _logger = Modular.get<Logger>();
 
   @override
@@ -24,12 +24,14 @@ class GeolocationService implements IGeolocationService {
   @override
   void stopLocationTracking() {
     _logger.i('[GeolocationService] - dispose');
-    _positionStream?.cancel();
-    _positionStream = null;
+    if (_positionStream != null) {
+      _positionStream!.cancel();
+      _positionStream = null;
+    }
   }
 
   void _watchPosition(void Function(Position position)? onLocationUpdate) {
-    _positionStream = Geolocator.getPositionStream(
+    _positionStream ??= Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.bestForNavigation,
         distanceFilter: 10,

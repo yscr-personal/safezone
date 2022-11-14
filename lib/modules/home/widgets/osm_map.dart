@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:unb/common/cubits/auth/auth_cubit.dart';
 import 'package:unb/common/cubits/group/group_cubit.dart';
 import 'package:unb/common/interfaces/i_geolocation_service.dart';
 import 'package:unb/common/widgets/loading_indicator.dart';
@@ -20,6 +21,7 @@ class OsmMap extends StatefulWidget {
 class _OsmMapState extends State<OsmMap> {
   final _mapController = MapController();
   final _geoService = Modular.get<IGeolocationService>();
+  final _authCubit = Modular.get<AuthCubit>();
 
   final _centerCurrentLocationStreamController = StreamController<double?>();
   var _centerOnLocationUpdate = CenterOnLocationUpdate.always;
@@ -54,7 +56,7 @@ class _OsmMapState extends State<OsmMap> {
             height: 40,
             width: 40,
             builder: (ctx) => CircleAvatar(
-              backgroundImage: NetworkImage(member.avatarUrl!),
+              foregroundImage: NetworkImage(member.avatarUrl!),
             ),
           ),
         )
@@ -84,6 +86,27 @@ class _OsmMapState extends State<OsmMap> {
           right: 5,
           top: 20,
           child: FloatingActionButton(
+            heroTag: '<FloatingActionButton logout>',
+            backgroundColor: Colors.grey.shade800,
+            mini: true,
+            shape: BeveledRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+            onPressed: () {
+              _authCubit.logout();
+              Modular.to.pushReplacementNamed('/auth/');
+            },
+            child: const Icon(
+              Icons.logout,
+              color: Colors.red,
+            ),
+          ),
+        ),
+        Positioned(
+          right: 5,
+          top: 80,
+          child: FloatingActionButton(
+            heroTag: '<FloatingActionButton center>',
             backgroundColor: Colors.grey.shade800,
             mini: true,
             shape: BeveledRectangleBorder(
