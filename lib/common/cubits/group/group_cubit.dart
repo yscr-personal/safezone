@@ -28,9 +28,9 @@ class GroupCubit extends Cubit<GroupState> {
       if (groupJson == null) {
         throw const GroupException('Failed to fetch group');
       }
-      final group =
+      final List<UserModel> group =
           groupJson.map<UserModel>((json) => UserModel.fromJson(json)).toList();
-      emit(GroupLoaded(group: group));
+      emit(GroupLoaded(group: group.sublist(0, min(5, group.length))));
     } on GroupException catch (e) {
       emit(GroupError(message: e.message));
     } catch (exception, stackTrace) {
