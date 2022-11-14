@@ -5,11 +5,11 @@ import 'package:unb/modules/home/home_screen.dart';
 class HomeModule extends Module {
   @override
   List<Bind> get binds => [
-        Bind((i) => GroupCubit(i())),
+        Bind((i) => GroupCubit(i(), i())),
       ];
 
   @override
   List<ModularRoute> get routes => [
-        ChildRoute('/', child: (context, args) => HomeScreen()),
+        ChildRoute('/', child: (context, args) => const HomeScreen()),
       ];
 }

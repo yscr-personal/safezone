@@ -12,28 +12,28 @@ import 'package:unb/common/storage/user_preferences.dart';
 class CoreModule extends Module {
   @override
   List<Bind> get binds => [
-        Bind.singleton<IAuthService>(
+        Bind<IAuthService>(
           (i) => AwsAuthService(),
           export: true,
         ),
-        Bind.singleton<IHttpService>(
+        Bind<IHttpService>(
           (i) => DioHttpService(),
           export: true,
         ),
-        Bind.singleton(
+        Bind(
           (i) => UserPreferences(),
           export: true,
         ),
-        Bind.singleton(
+        Bind(
           (i) => Logger(),
           export: true,
         ),
-        Bind.singleton<IGeolocationService>(
+        Bind<IGeolocationService>(
           (i) => GeolocationService(),
           export: true,
         ),
-        Bind.singleton(
-          (i) => AuthCubit(authService: i()),
+        Bind(
+          (i) => AuthCubit(i(), i()),
           export: true,
         ),
       ];
