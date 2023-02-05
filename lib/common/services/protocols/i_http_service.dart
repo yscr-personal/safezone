@@ -1,23 +1,23 @@
 abstract class IHttpService {
-  Future get(
+  Future<T> get<T>(
     final String url, {
     final Map<String, String>? headers,
     final Map<String, String>? queryParameters,
   });
 
-  Future post(
+  Future<T> post<T>(
     final String url, {
     final Map<String, String>? headers,
     final dynamic body,
   });
 
-  Future put(
+  Future<T> put<T>(
     final String url, {
     final Map<String, String>? headers,
     final dynamic body,
   });
 
-  Future delete(
+  Future<T> delete<T>(
     final String url, {
     final Map<String, String>? headers,
   });

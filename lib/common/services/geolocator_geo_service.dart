@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
-import 'package:unb/common/interfaces/i_geolocation_service.dart';
+import 'package:unb/common/services/protocols/i_geolocation_service.dart';
 
 class GeolocationService implements IGeolocationService {
   StreamSubscription<Position>? _positionStream;
@@ -15,8 +15,9 @@ class GeolocationService implements IGeolocationService {
   }
 
   @override
-  void startLocationTracking(
-      {void Function(dynamic position)? onLocationUpdate}) {
+  void startLocationTracking({
+    void Function(Position position)? onLocationUpdate,
+  }) {
     _logger.i('[GeolocationService] - init');
     _watchPosition(onLocationUpdate);
   }

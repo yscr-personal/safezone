@@ -1,10 +1,10 @@
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:logger/logger.dart';
-import 'package:unb/common/interfaces/i_auth_service.dart';
+import 'package:unb/common/cubits/auth/auth_cubit.dart';
 
 class AuthGuard extends RouteGuard {
   final _logger = Modular.get<Logger>();
-  final _authService = Modular.get<IAuthService>();
+  final _authCubit = Modular.get<AuthCubit>();
 
   AuthGuard() : super(redirectTo: '/auth/');
 
@@ -16,6 +16,6 @@ class AuthGuard extends RouteGuard {
   }
 
   Future<bool> _isLoggedIn() async {
-    return await _authService.isLogged();
+    return _authCubit.state is AuthLoaded;
   }
 }

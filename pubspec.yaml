@@ -50,14 +50,14 @@ dependencies:
   flutter_bloc: ^8.1.1
   pretty_dio_logger: ^1.2.0-beta-1
   logger: ^1.1.0
-  amplify_flutter: ^0.6.9
-  amplify_authenticator: ^0.2.3
-  amplify_auth_cognito: ^0.6.9
-  amplify_datastore: ^0.6.9
-  amplify_api: ^0.6.9
   modular_bloc_bind: ^1.0.1
   sliding_up_panel: ^2.0.0+1
   sentry_flutter: ^6.15.1
+  dio_smart_retry: ^1.4.0
+  retrofit: ^3.3.1
+  json_annotation: ^4.7.0
+  either_dart: ^0.3.0
+  socket_io_client: ^2.0.1
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +69,10 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  retrofit_generator: '>=4.0.0 <5.0.0'
+  build_runner: '>2.3.0 <4.0.0'
+  json_serializable: '>4.4.0'
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

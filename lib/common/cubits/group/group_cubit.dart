@@ -1,78 +1,85 @@
 import 'dart:async';
-import 'dart:math';
 
-import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:logger/logger.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:unb/common/business_exception.dart';
-import 'package:unb/common/interfaces/i_http_service.dart';
+import 'package:unb/common/clients/safezone_api/groups_service.dart';
+import 'package:unb/common/models/group_model.dart';
 import 'package:unb/common/models/user_model.dart';
 
 part 'group_state.dart';
 
-class GroupException extends BusinessException {
-  const GroupException(super.message);
-}
-
 class GroupCubit extends Cubit<GroupState> {
-  final IHttpService _httpService;
-  final Logger _logger;
+  final _logger = Modular.get<Logger>();
+  final GroupsService _groupsService;
 
-  GroupCubit(this._httpService, this._logger) : super(GroupInitial());
+  GroupCubit(this._groupsService) : super(GroupInitial());
 
-  Future<void> fetchGroup() async {
+  Future<void> fetchGroups() async {
     emit(GroupLoading());
     try {
-      final groupJson = await _httpService.get('/users');
-      if (groupJson == null) {
-        throw const GroupException('Failed to fetch group');
+      final result = await _groupsService.getGroups();
+      if (result.isLeft) {
+        throw result.left;
       }
-      final List<UserModel> group =
-          groupJson.map<UserModel>((json) => UserModel.fromJson(json)).toList();
-      emit(GroupLoaded(group: group.sublist(0, min(5, group.length))));
-    } on GroupException catch (e) {
-      emit(GroupError(message: e.message));
-    } catch (exception, stackTrace) {
-      _logger.e(exception.toString());
-      await Sentry.captureException(
-        exception,
-        stackTrace: stackTrace,
+      final groups = result.right;
+      emit(
+        GroupLoaded(
+          groups: groups,
+          selected: groups.isNotEmpty ? groups.first : null,
+        ),
       );
-      emit(GroupError(message: exception.toString()));
+    } catch (exception, stackTrace) {
+      _captureException(exception, stackTrace);
     }
   }
 
-  Future<void> updateGroupLocation() async {
-    if (state is GroupLoaded) {
-      final group = (state as GroupLoaded).group;
-      final updated = group[Random().nextInt(group.length)];
-      _logger.d('Updating location for ${updated.name}');
-      final newGroup = group
-          .map((e) => e == updated
-              ? UserModel(
-                  id: e.id,
-                  name: e.name,
-                  email: e.email,
-                  avatarUrl: e.avatarUrl,
-                  address: UserAddressModel(
-                    street: e.address!.street,
-                    suite: e.address!.suite,
-                    city: e.address!.city,
-                    zipcode: e.address!.zipcode,
-                    geo: UserAddressGeoModel(
-                      lat: (double.parse(e.address!.geo.lat) +
-                              Random().nextDouble() * 0.02)
-                          .toString(),
-                      lng: (double.parse(e.address!.geo.lng) +
-                              Random().nextDouble() * 0.02)
-                          .toString(),
-                    ),
-                  ),
-                )
-              : e)
-          .toList();
-      emit(GroupLoaded(group: newGroup));
-    }
+  Future<void> updateGroupMemberLocation(
+    final String memberId, {
+    required final double latitude,
+    required final double longitude,
+  }) async {
+    if (state is! GroupLoaded) return;
+
+    final groupLoadedState = state as GroupLoaded;
+    final groups = groupLoadedState.groups;
+    final group = groupLoadedState.selected!;
+
+    _logger.d(
+      'Updating user $memberId to location [$latitude, $longitude] for ${group.name}',
+    );
+
+    final newMember = UserModel.copyWith(
+      group.members!.firstWhere((e) => e.id == memberId),
+      lastLatitude: latitude,
+      lastLongitude: longitude,
+    );
+
+    final newGroup = GroupModel.copyWith(
+      group,
+      members:
+          group.members!.map((e) => e.id == memberId ? newMember : e).toList(),
+    );
+
+    emit(
+      GroupLoaded(
+        groups: groups.map((g) => g.id == group.id ? newGroup : g).toList(),
+        selected: newGroup,
+      ),
+    );
+  }
+
+  _captureException(
+    final exception,
+    final stackTrace,
+  ) async {
+    _logger.e(exception.toString());
+    await Sentry.captureException(
+      exception,
+      stackTrace: stackTrace,
+    );
+    emit(GroupError(message: exception.toString()));
   }
 }

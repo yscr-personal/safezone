@@ -16,6 +16,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   var _pwdVisible = false;
   var _email = '';
   var _password = '';
+  var _username = '';
+  var _name = '';
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +50,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     return null;
                   },
                 ),
+                TextFormField(
+                  onSaved: (final value) {
+                    _username = value ?? '';
+                  },
+                  decoration: const InputDecoration(
+                    hintText: 'Username',
+                    border: OutlineInputBorder(),
+                    suffixIcon: Icon(Icons.person),
+                  ),
+                  keyboardType: TextInputType.name,
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a valid username';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  onSaved: (final value) {
+                    _name = value ?? '';
+                  },
+                  decoration: const InputDecoration(
+                    hintText: 'Name',
+                    border: OutlineInputBorder(),
+                    suffixIcon: Icon(Icons.person),
+                  ),
+                  keyboardType: TextInputType.name,
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a valid name';
+                    }
+                    return null;
+                  },
+                ),
                 const SizedBox(height: 16.0),
                 TextFormField(
                   onSaved: (final value) {
@@ -73,40 +109,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     if (value == null || value.isEmpty) {
                       return 'password is required';
                     }
-
                     if (value.length < 8) {
                       return 'password must be at least 8 characters';
                     }
-
-                    if (value.length > 256) {
-                      return 'password must be at most 256 characters';
-                    }
-
-                    final containsUpperCase = value.contains(RegExp(r'[A-Z]'));
-
-                    if (!containsUpperCase) {
-                      return 'password must contain at least one uppercase letter';
-                    }
-
-                    final containsLowerCase = value.contains(RegExp(r'[A-Z]'));
-
-                    if (!containsLowerCase) {
-                      return 'password must contain at least one lowercase letter';
-                    }
-
-                    final containsNumber = value.contains(RegExp(r'[0-9]'));
-
-                    if (!containsNumber) {
-                      return 'password must contain at least one number';
-                    }
-
-                    final containsSpecialCharacter = value.contains(
-                        RegExp(r'''[\^$*.[\]{}()?"!@#%&/\\,><':;|_~`=+\- ]'''));
-
-                    if (!containsSpecialCharacter) {
-                      return 'password must contain at least one special character';
-                    }
-
                     return null;
                   },
                 ),
@@ -118,6 +123,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       final valid = await _signupController.signUpUser(
                         _email,
                         _password,
+                        _username,
+                        _name,
                       );
                       if (valid) {
                         Modular.to.pushReplacementNamed(

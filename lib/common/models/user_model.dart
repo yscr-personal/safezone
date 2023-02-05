@@ -1,88 +1,54 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
+part 'user_model.g.dart';
 
-class UserAddressGeoModel extends Equatable {
-  final String lat;
-  final String lng;
-
-  const UserAddressGeoModel({required this.lat, required this.lng});
-
-  @override
-  List<Object> get props => [lat, lng];
-}
-
-class UserAddressModel extends Equatable {
-  final String street;
-  final String suite;
-  final String city;
-  final String zipcode;
-  final UserAddressGeoModel geo;
-
-  const UserAddressModel({
-    required this.street,
-    required this.suite,
-    required this.city,
-    required this.zipcode,
-    required this.geo,
-  });
-
-  @override
-  List<Object> get props => [street, suite, city, zipcode, geo];
-}
-
+@JsonSerializable(fieldRename: FieldRename.snake)
 class UserModel extends Equatable {
   final String id;
-  final String? name;
   final String? email;
-  final String? avatarUrl;
-  final UserAddressModel? address;
+  final String? username;
+  final String? name;
+  final double? lastLatitude;
+  final double? lastLongitude;
+  final DateTime? lastSeen;
 
   const UserModel({
     required this.id,
-    this.name,
     this.email,
-    this.avatarUrl,
-    this.address,
+    this.username,
+    this.name,
+    this.lastLatitude,
+    this.lastLongitude,
+    this.lastSeen,
   });
-
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    final strId = json['id'].toString();
-    return UserModel(
-      id: strId,
-      name: json['name'],
-      email: json['email'],
-      avatarUrl: 'https://picsum.photos/id/${int.parse(strId) * 100}/200',
-      address: UserAddressModel(
-        street: json['address']['street'],
-        suite: json['address']['suite'],
-        city: json['address']['city'],
-        zipcode: json['address']['zipcode'],
-        geo: UserAddressGeoModel(
-          lat: json['address']['geo']['lat'],
-          lng: json['address']['geo']['lng'],
-        ),
-      ),
-    );
-  }
 
   factory UserModel.empty() => const UserModel(id: '');
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'email': email,
-        'avatarUrl': avatarUrl,
-        'address': {
-          'street': address?.street,
-          'suite': address?.suite,
-          'city': address?.city,
-          'zipcode': address?.zipcode,
-          'geo': {
-            'lat': address?.geo.lat,
-            'lng': address?.geo.lng,
-          },
-        },
-      };
+  factory UserModel.copyWith(
+    final UserModel other, {
+    final String? email,
+    final String? username,
+    final String? name,
+    final double? lastLatitude,
+    final double? lastLongitude,
+    final DateTime? lastSeen,
+  }) =>
+      UserModel(
+        id: other.id,
+        email: email ?? other.email,
+        username: username ?? other.username,
+        name: name ?? other.name,
+        lastLatitude: lastLatitude ?? other.lastLatitude,
+        lastLongitude: lastLongitude ?? other.lastLongitude,
+        lastSeen: lastSeen ?? other.lastSeen,
+      );
+
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserModelToJson(this);
 
   @override
-  List<Object?> get props => [id, name, email, address];
+  List<Object?> get props =>
+      [id, name, username, lastLatitude, lastLongitude, lastSeen];
 }

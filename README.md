@@ -12,4 +12,5 @@ flutter pub get
 
 ```sh
 flutter pub run environment_config:generate
+flutter pub run build_runner build
 ```

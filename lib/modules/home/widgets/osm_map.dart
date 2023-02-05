@@ -8,20 +8,23 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:unb/common/cubits/auth/auth_cubit.dart';
 import 'package:unb/common/cubits/group/group_cubit.dart';
-import 'package:unb/common/interfaces/i_geolocation_service.dart';
+import 'package:unb/common/cubits/websocket/websocket_cubit.dart';
+import 'package:unb/common/services/protocols/i_geolocation_service.dart';
 import 'package:unb/common/widgets/loading_indicator.dart';
 
 class OsmMap extends StatefulWidget {
-  const OsmMap({Key? key}) : super(key: key);
+  final MapController mapController;
+
+  const OsmMap({Key? key, required this.mapController}) : super(key: key);
 
   @override
   State<OsmMap> createState() => _OsmMapState();
 }
 
 class _OsmMapState extends State<OsmMap> {
-  final _mapController = MapController();
   final _geoService = Modular.get<IGeolocationService>();
   final _authCubit = Modular.get<AuthCubit>();
+  final _websocketCubit = Modular.get<WebsocketCubit>();
 
   final _centerCurrentLocationStreamController = StreamController<double?>();
   var _centerOnLocationUpdate = CenterOnLocationUpdate.always;
@@ -46,24 +49,32 @@ class _OsmMapState extends State<OsmMap> {
   }
 
   _buildMap(final GroupLoaded state) {
-    final markers = state.group
+    final markers = state.selected?.members
+        ?.where(
+          (m) =>
+              (m.lastLatitude != null && m.lastLongitude != null) &&
+              (m.id != (_authCubit.state as AuthLoaded).user.id),
+        )
         .map(
           (member) => Marker(
             point: LatLng(
-              double.parse(member.address!.geo.lat),
-              double.parse(member.address!.geo.lng),
+              member.lastLatitude!,
+              member.lastLongitude!,
             ),
             height: 40,
             width: 40,
             builder: (ctx) => CircleAvatar(
-              foregroundImage: NetworkImage(member.avatarUrl!),
+              foregroundImage: NetworkImage(
+                'https://picsum.photos/${int.parse(member.id.substring(0, 2), radix: 16)}',
+              ),
+              // MemoryImage(base64Decode(member.profilePicture!)),
             ),
           ),
         )
         .toList();
 
     return FlutterMap(
-      mapController: _mapController,
+      mapController: widget.mapController,
       options: MapOptions(
         minZoom: 3,
         maxZoom: 19,
@@ -77,8 +88,15 @@ class _OsmMapState extends State<OsmMap> {
         },
         onMapReady: () async {
           final pos = await _geoService.getCurrentLocation();
-          _mapController.move(LatLng(pos.latitude, pos.longitude), 19);
-          _geoService.startLocationTracking();
+          widget.mapController.move(LatLng(pos.latitude, pos.longitude), 19);
+          _geoService.startLocationTracking(
+            onLocationUpdate: (location) {
+              _websocketCubit.sendLocationUpdate(
+                (_authCubit.state as AuthLoaded).user.id,
+                LatLng(location.latitude, location.longitude),
+              );
+            },
+          );
         },
       ),
       nonRotatedChildren: [
@@ -139,9 +157,20 @@ class _OsmMapState extends State<OsmMap> {
           centerOnLocationUpdate: _centerOnLocationUpdate,
           centerCurrentLocationStream:
               _centerCurrentLocationStreamController.stream,
+          style: LocationMarkerStyle(
+            marker: CircleAvatar(
+              backgroundImage: NetworkImage(
+                'https://picsum.photos/${int.parse((_authCubit.state as AuthLoaded).user.id.substring(0, 2), radix: 16)}',
+              ),
+              // MemoryImage(
+              //   base64Decode(member.profilePicture!),
+              // ),
+            ),
+            markerSize: const Size(30, 30),
+          ),
         ),
         MarkerLayer(
-          markers: markers,
+          markers: markers ?? [],
         ),
       ],
     );

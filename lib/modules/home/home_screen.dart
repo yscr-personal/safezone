@@ -1,12 +1,16 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:logger/logger.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:unb/common/cubits/auth/auth_cubit.dart';
 import 'package:unb/common/cubits/group/group_cubit.dart';
+import 'package:unb/common/cubits/websocket/websocket_cubit.dart';
 import 'package:unb/common/widgets/base_screen_layout.dart';
 import 'package:unb/common/widgets/loading_indicator.dart';
+import 'package:unb/modules/home/models/location_received_payload.dart';
 import 'package:unb/modules/home/widgets/osm_map.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,21 +22,30 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _groupCubit = Modular.get<GroupCubit>();
-  Timer? timer;
+  final _authCubit = Modular.get<AuthCubit>();
+  final _websocketCubit = Modular.get<WebsocketCubit>();
+  final _logger = Modular.get<Logger>();
+  final _mapController = MapController();
 
   @override
   void initState() {
     super.initState();
-    _groupCubit.fetchGroup();
-    timer = Timer.periodic(
-      const Duration(seconds: 5),
-      (_) => _groupCubit.updateGroupLocation(),
+    _groupCubit.fetchGroups();
+    _websocketCubit.listenToReceiveLocationUpdate(
+      (final LocationReceivedPayload payload) {
+        if (payload.userId == (_groupCubit.state as AuthLoaded).user.id) return;
+        _logger.d('Received location update: $payload');
+        _groupCubit.updateGroupMemberLocation(
+          payload.userId,
+          latitude: payload.latitude,
+          longitude: payload.longitude,
+        );
+      },
     );
   }
 
   @override
   void dispose() {
-    timer?.cancel();
     super.dispose();
   }
 
@@ -54,7 +67,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           header: _buildAddPersonButton(),
           panel: _buildPanel(),
-          body: const OsmMap(),
+          body: OsmMap(
+            mapController: _mapController,
+          ),
         ),
       ),
     );
@@ -65,7 +80,15 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, state) {
         switch (state.runtimeType) {
           case GroupLoaded:
-            return _buildGroupList(state as GroupLoaded);
+            {
+              final groupLoaded = state as GroupLoaded;
+              if (groupLoaded.selected == null) {
+                return const Center(
+                  child: Text('Select a group to see its members'),
+                );
+              }
+              return _buildGroupList(groupLoaded);
+            }
         }
         return const LoadingIndicator();
       },
@@ -77,20 +100,38 @@ class _HomeScreenState extends State<HomeScreen> {
     return Padding(
       padding: EdgeInsets.only(top: height * 0.08),
       child: ListView.builder(
-        itemCount: state.group.length,
+        itemCount: state.selected!.members!.length,
         itemBuilder: (final context, final index) {
-          final member = state.group[index];
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(member.avatarUrl!),
-            ),
-            title: Text(member.name!),
-            subtitle: Text(member.email!),
-            trailing: IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.location_on),
-            ),
-          );
+          final member = state.selected!.members![index];
+          final hasLocation =
+              member.lastLatitude != null && member.lastLongitude != null;
+          return (member.id == (_authCubit.state as AuthLoaded).user.id)
+              ? Container()
+              : ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(
+                      'https://picsum.photos/${int.parse(member.id.substring(0, 2), radix: 16)}',
+                    ),
+                    // MemoryImage(
+                    //   base64Decode(member.profilePicture!),
+                    // ),
+                  ),
+                  title: Text(member.name!),
+                  subtitle: Text(member.email!),
+                  trailing: hasLocation
+                      ? IconButton(
+                          onPressed: () {
+                            _logger.d(member.toJson());
+                            _mapController.move(
+                              LatLng(
+                                  member.lastLatitude!, member.lastLongitude!),
+                              19,
+                            );
+                          },
+                          icon: const Icon(Icons.location_on),
+                        )
+                      : null,
+                );
         },
       ),
     );
@@ -126,7 +167,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                IconButton(onPressed: () {}, icon: const Icon(Icons.add))
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.add),
+                )
               ],
             ),
           ),

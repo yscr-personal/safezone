@@ -4,6 +4,15 @@ environment_config:
   class: EnvironmentConfig
 
   fields:
-    BACKEND_URL:
+    SAFEZONE_API_URL:
+      dotenv: true
+      default: <REQUIRED>
+    SAFEZONE_WEBSOCKET_URL:
+      dotenv: true
+      default: <REQUIRED>
+    ENV:
+      dotenv: true
+      default: dev
+    SENTRY_DSN:
       dotenv: true
       default: <REQUIRED>

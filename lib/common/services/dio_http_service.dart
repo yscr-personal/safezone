@@ -1,12 +1,13 @@
 import 'package:dio/dio.dart';
+import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:unb/common/environment_config.dart';
-import 'package:unb/common/interfaces/i_http_service.dart';
+import 'package:unb/common/services/protocols/i_http_service.dart';
 
 class DioHttpService implements IHttpService {
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: EnvironmentConfig.BACKEND_URL,
+      baseUrl: EnvironmentConfig.SAFEZONE_API_URL,
       connectTimeout: 5000,
       receiveTimeout: 3000,
       contentType: 'application/json',
@@ -16,15 +17,16 @@ class DioHttpService implements IHttpService {
 
   DioHttpService() {
     _dio.interceptors.add(PrettyDioLogger());
+    _dio.interceptors.add(RetryInterceptor(dio: _dio));
   }
 
   @override
-  Future get(
+  Future<T> get<T>(
     final String url, {
     final Map<String, String>? headers,
     final Map<String, String>? queryParameters,
   }) async {
-    final response = await _dio.get(
+    final response = await _dio.get<T>(
       url,
       queryParameters: queryParameters,
       options: Options(
@@ -32,18 +34,24 @@ class DioHttpService implements IHttpService {
       ),
     );
 
-    if (response.statusCode == 200) {
-      return response.data;
+    final T? data = response.data;
+    if (response.statusCode == 200 && data != null) {
+      return data;
     }
+
+    throw DioError(
+      requestOptions: response.requestOptions,
+      response: response,
+    );
   }
 
   @override
-  Future post(
+  Future<T> post<T>(
     final String url, {
     final Map<String, String>? headers,
     final body,
   }) async {
-    final response = await _dio.post(
+    final response = await _dio.post<T>(
       url,
       data: body,
       options: Options(
@@ -51,18 +59,24 @@ class DioHttpService implements IHttpService {
       ),
     );
 
-    if ([200, 201].contains(response.statusCode)) {
-      return response.data;
+    final T? data = response.data;
+    if ([200, 201].contains(response.statusCode) && data != null) {
+      return data;
     }
+
+    throw DioError(
+      requestOptions: response.requestOptions,
+      response: response,
+    );
   }
 
   @override
-  Future put(
+  Future<T> put<T>(
     final String url, {
     final Map<String, String>? headers,
     final body,
   }) async {
-    final response = await _dio.put(
+    final response = await _dio.put<T>(
       url,
       data: body,
       options: Options(
@@ -70,25 +84,37 @@ class DioHttpService implements IHttpService {
       ),
     );
 
-    if (response.statusCode == 200) {
-      return response.data;
+    final T? data = response.data;
+    if (response.statusCode == 200 && data != null) {
+      return data;
     }
+
+    throw DioError(
+      requestOptions: response.requestOptions,
+      response: response,
+    );
   }
 
   @override
-  Future delete(
+  Future<T> delete<T>(
     final String url, {
     final Map<String, String>? headers,
   }) async {
-    final response = await _dio.delete(
+    final response = await _dio.delete<T>(
       url,
       options: Options(
         headers: headers,
       ),
     );
 
-    if (response.statusCode == 200) {
-      return response.data;
+    final T? data = response.data;
+    if (response.statusCode == 200 && data != null) {
+      return data;
     }
+
+    throw DioError(
+      requestOptions: response.requestOptions,
+      response: response,
+    );
   }
 }

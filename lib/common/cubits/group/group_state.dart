@@ -12,12 +12,13 @@ class GroupInitial extends GroupState {}
 class GroupLoading extends GroupState {}
 
 class GroupLoaded extends GroupState {
-  final List<UserModel> group;
+  final List<GroupModel> groups;
+  final GroupModel? selected;
 
-  const GroupLoaded({required this.group});
+  const GroupLoaded({required this.groups, this.selected});
 
   @override
-  List<Object> get props => [group];
+  List<Object> get props => [groups];
 }
 
 class GroupError extends GroupState {

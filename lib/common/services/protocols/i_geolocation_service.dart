@@ -1,8 +1,10 @@
+import 'package:geolocator/geolocator.dart';
+
 abstract class IGeolocationService {
   Future getCurrentLocation();
 
   void startLocationTracking({
-    void Function(dynamic position)? onLocationUpdate,
+    void Function(Position position)? onLocationUpdate,
   });
 
   void stopLocationTracking();

@@ -1,7 +1,7 @@
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:logger/logger.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:unb/common/interfaces/i_auth_service.dart';
+import 'package:unb/common/services/protocols/i_auth_service.dart';
 
 class SignupController {
   final _logger = Modular.get<Logger>();
@@ -10,22 +10,22 @@ class SignupController {
   Future<bool> signUpUser(
     final String email,
     final String password,
+    final String username,
+    final String name,
   ) async {
     try {
-      return await _authService.register(email, password);
-    } catch (exception, stackTrace) {
-      _logger.e(exception.toString());
-      await Sentry.captureException(
-        exception,
-        stackTrace: stackTrace,
+      final result = await _authService.register(
+        RegisterRequest(
+          email: email,
+          username: username,
+          name: name,
+          password: password,
+        ),
       );
-    }
-    return false;
-  }
-
-  Future<bool> confirmUser(final String username, final String code) async {
-    try {
-      return await _authService.confirmRegistration(username, code);
+      if (result.isRight) {
+        return true;
+      }
+      throw result.left;
     } catch (exception, stackTrace) {
       _logger.e(exception.toString());
       await Sentry.captureException(
