@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:unb/common/widgets/base_screen_layout.dart';
 import 'package:unb/modules/auth/signup/signup_controller.dart';
 
@@ -12,16 +16,30 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _picker = ImagePicker();
+
   final _signupController = Modular.get<SignupController>();
+
   var _pwdVisible = false;
   var _email = '';
   var _password = '';
   var _username = '';
   var _name = '';
+  XFile? _image;
+
+  Future pickImage() async {
+    final image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 100,
+    );
+    if (image == null) return;
+    setState(() => _image = XFile(image.path));
+  }
 
   @override
   Widget build(BuildContext context) {
     return BaseScreenLayout(
+      overflowTop: true,
       child: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -32,6 +50,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                const SizedBox(height: 16.0),
+                CircleAvatar(
+                  radius: 70,
+                  backgroundImage: _image == null
+                      ? const AssetImage('assets/images/safezone-logo.png')
+                          as ImageProvider
+                      : FileImage(File(_image!.path)),
+                  child: IconButton(
+                    onPressed: () => pickImage(),
+                    icon: const Icon(
+                      Icons.add_a_photo,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 16.0),
                 TextFormField(
                   onSaved: (final value) {
@@ -50,6 +83,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 16.0),
                 TextFormField(
                   onSaved: (final value) {
                     _username = value ?? '';
@@ -67,6 +101,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 16.0),
                 TextFormField(
                   onSaved: (final value) {
                     _name = value ?? '';
@@ -118,13 +153,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 16.0),
                 ElevatedButton(
                   onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
+                    if (_formKey.currentState!.validate() && _image != null) {
                       _formKey.currentState!.save();
                       final valid = await _signupController.signUpUser(
                         _email,
                         _password,
                         _username,
                         _name,
+                        base64Encode(await _image!.readAsBytes()),
                       );
                       if (valid) {
                         Modular.to.pushReplacementNamed(

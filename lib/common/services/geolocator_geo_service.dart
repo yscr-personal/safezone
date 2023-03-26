@@ -25,10 +25,8 @@ class GeolocationService implements IGeolocationService {
   @override
   void stopLocationTracking() {
     _logger.i('[GeolocationService] - dispose');
-    if (_positionStream != null) {
-      _positionStream!.cancel();
-      _positionStream = null;
-    }
+    _positionStream?.cancel();
+    _positionStream = null;
   }
 
   void _watchPosition(void Function(Position position)? onLocationUpdate) {

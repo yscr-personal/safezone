@@ -11,6 +11,7 @@ class UserModel extends Equatable {
   final double? lastLatitude;
   final double? lastLongitude;
   final DateTime? lastSeen;
+  final String? profilePicture;
 
   const UserModel({
     required this.id,
@@ -20,6 +21,7 @@ class UserModel extends Equatable {
     this.lastLatitude,
     this.lastLongitude,
     this.lastSeen,
+    this.profilePicture,
   });
 
   factory UserModel.empty() => const UserModel(id: '');
@@ -32,6 +34,7 @@ class UserModel extends Equatable {
     final double? lastLatitude,
     final double? lastLongitude,
     final DateTime? lastSeen,
+    final String? profilePicture,
   }) =>
       UserModel(
         id: other.id,
@@ -41,6 +44,7 @@ class UserModel extends Equatable {
         lastLatitude: lastLatitude ?? other.lastLatitude,
         lastLongitude: lastLongitude ?? other.lastLongitude,
         lastSeen: lastSeen ?? other.lastSeen,
+        profilePicture: profilePicture ?? other.profilePicture,
       );
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
@@ -49,6 +53,13 @@ class UserModel extends Equatable {
   Map<String, dynamic> toJson() => _$UserModelToJson(this);
 
   @override
-  List<Object?> get props =>
-      [id, name, username, lastLatitude, lastLongitude, lastSeen];
+  List<Object?> get props => [
+        id,
+        name,
+        username,
+        lastLatitude,
+        lastLongitude,
+        lastSeen,
+        profilePicture
+      ];
 }

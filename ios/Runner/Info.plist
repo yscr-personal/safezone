@@ -51,5 +51,9 @@
     <string>To get location and direction</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>To get location and direction</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow SafeZone to access your photo library</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow SafeZone to access your camera</string>
 </dict>
 </plist>

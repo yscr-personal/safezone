@@ -36,6 +36,25 @@ class GroupCubit extends Cubit<GroupState> {
     }
   }
 
+  void selectGroup(final String groupId) {
+    if (state is! GroupLoaded) return;
+
+    final groupLoadedState = state as GroupLoaded;
+    final groups = groupLoadedState.groups;
+
+    final selected = groups.firstWhere(
+      (element) => element.id == groupId,
+      orElse: () => groups.first,
+    );
+
+    emit(
+      GroupLoaded(
+        groups: groups,
+        selected: selected,
+      ),
+    );
+  }
+
   Future<void> updateGroupMemberLocation(
     final String memberId, {
     required final double latitude,

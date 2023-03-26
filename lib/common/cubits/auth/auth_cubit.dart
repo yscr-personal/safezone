@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:logger/logger.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:unb/common/models/requests/login_request.dart';
 import 'package:unb/common/models/user_model.dart';
 import 'package:unb/common/services/protocols/i_auth_service.dart';
 

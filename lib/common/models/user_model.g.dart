@@ -16,6 +16,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       lastSeen: json['last_seen'] == null
           ? null
           : DateTime.parse(json['last_seen'] as String),
+      profilePicture: json['profile_picture'] as String?,
     );
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
@@ -26,4 +27,5 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'last_latitude': instance.lastLatitude,
       'last_longitude': instance.lastLongitude,
       'last_seen': instance.lastSeen?.toIso8601String(),
+      'profile_picture': instance.profilePicture,
     };

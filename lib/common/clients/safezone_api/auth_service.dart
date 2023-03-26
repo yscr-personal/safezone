@@ -1,4 +1,6 @@
 import 'package:either_dart/either.dart';
+import 'package:unb/common/models/requests/login_request.dart';
+import 'package:unb/common/models/requests/register_request.dart';
 import 'package:unb/common/models/user_model.dart';
 import 'package:unb/common/services/protocols/i_auth_service.dart';
 import 'package:unb/common/services/protocols/i_http_service.dart';
@@ -18,10 +20,7 @@ class AuthService implements IAuthService {
     try {
       final result = await _httpService.post(
         '/auth/login',
-        body: {
-          'email': req.email,
-          'password': req.password,
-        },
+        body: req.toJson(),
       );
       await _userPreferences.saveToken(result['access_token']);
       return Right(UserModel.fromJson(result));
@@ -36,12 +35,7 @@ class AuthService implements IAuthService {
       return Right(
         await _httpService.post(
           '/auth/register',
-          body: {
-            'email': req.email,
-            'username': req.username,
-            'name': req.name,
-            'password': req.password,
-          },
+          body: req.toJson(),
         ),
       );
     } on Exception catch (e) {

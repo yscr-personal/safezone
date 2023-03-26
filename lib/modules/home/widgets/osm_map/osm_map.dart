@@ -9,8 +9,11 @@ import 'package:latlong2/latlong.dart';
 import 'package:unb/common/cubits/auth/auth_cubit.dart';
 import 'package:unb/common/cubits/group/group_cubit.dart';
 import 'package:unb/common/cubits/websocket/websocket_cubit.dart';
+import 'package:unb/common/models/user_model.dart';
 import 'package:unb/common/services/protocols/i_geolocation_service.dart';
 import 'package:unb/common/widgets/loading_indicator.dart';
+import 'package:unb/modules/home/widgets/group_selector.dart';
+import 'package:unb/modules/home/widgets/osm_map/osm_map_service.dart';
 
 class OsmMap extends StatefulWidget {
   final MapController mapController;
@@ -25,6 +28,7 @@ class _OsmMapState extends State<OsmMap> {
   final _geoService = Modular.get<IGeolocationService>();
   final _authCubit = Modular.get<AuthCubit>();
   final _websocketCubit = Modular.get<WebsocketCubit>();
+  final _mapService = Modular.get<MapService>();
 
   final _centerCurrentLocationStreamController = StreamController<double?>();
   var _centerOnLocationUpdate = CenterOnLocationUpdate.always;
@@ -32,6 +36,7 @@ class _OsmMapState extends State<OsmMap> {
   @override
   void dispose() {
     _centerCurrentLocationStreamController.close();
+    _geoService.stopLocationTracking();
     super.dispose();
   }
 
@@ -55,22 +60,7 @@ class _OsmMapState extends State<OsmMap> {
               (m.lastLatitude != null && m.lastLongitude != null) &&
               (m.id != (_authCubit.state as AuthLoaded).user.id),
         )
-        .map(
-          (member) => Marker(
-            point: LatLng(
-              member.lastLatitude!,
-              member.lastLongitude!,
-            ),
-            height: 40,
-            width: 40,
-            builder: (ctx) => CircleAvatar(
-              foregroundImage: NetworkImage(
-                'https://picsum.photos/${int.parse(member.id.substring(0, 2), radix: 16)}',
-              ),
-              // MemoryImage(base64Decode(member.profilePicture!)),
-            ),
-          ),
-        )
+        .map((member) => _buildMemberMarker(member))
         .toList();
 
     return FlutterMap(
@@ -102,7 +92,7 @@ class _OsmMapState extends State<OsmMap> {
       nonRotatedChildren: [
         Positioned(
           right: 5,
-          top: 20,
+          top: MediaQuery.of(context).padding.top + 20,
           child: FloatingActionButton(
             heroTag: '<FloatingActionButton logout>',
             backgroundColor: Colors.grey.shade800,
@@ -122,7 +112,7 @@ class _OsmMapState extends State<OsmMap> {
         ),
         Positioned(
           right: 5,
-          top: 80,
+          top: MediaQuery.of(context).padding.top + 80,
           child: FloatingActionButton(
             heroTag: '<FloatingActionButton center>',
             backgroundColor: Colors.grey.shade800,
@@ -139,6 +129,37 @@ class _OsmMapState extends State<OsmMap> {
             child: const Icon(
               Icons.my_location,
               color: Colors.blue,
+            ),
+          ),
+        ),
+        state.selected?.id != null
+            ? Positioned(
+                right: 5,
+                top: MediaQuery.of(context).padding.top + 140,
+                child: FloatingActionButton(
+                  heroTag: '<FloatingActionButton chat>',
+                  backgroundColor: Colors.grey.shade800,
+                  mini: true,
+                  shape: BeveledRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  onPressed: () {
+                    Modular.to.pushNamed('/chat/${state.selected!.id}');
+                  },
+                  child: const Icon(
+                    Icons.chat_bubble,
+                    color: Colors.lightGreen,
+                  ),
+                ),
+              )
+            : Container(),
+        Positioned.fill(
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding:
+                  EdgeInsets.only(top: MediaQuery.of(context).padding.top + 16),
+              child: const GroupSelector(),
             ),
           ),
         ),
@@ -159,12 +180,8 @@ class _OsmMapState extends State<OsmMap> {
               _centerCurrentLocationStreamController.stream,
           style: LocationMarkerStyle(
             marker: CircleAvatar(
-              backgroundImage: NetworkImage(
-                'https://picsum.photos/${int.parse((_authCubit.state as AuthLoaded).user.id.substring(0, 2), radix: 16)}',
-              ),
-              // MemoryImage(
-              //   base64Decode(member.profilePicture!),
-              // ),
+              backgroundImage: _mapService
+                  .getMemberImage((_authCubit.state as AuthLoaded).user),
             ),
             markerSize: const Size(30, 30),
           ),
@@ -173,6 +190,20 @@ class _OsmMapState extends State<OsmMap> {
           markers: markers ?? [],
         ),
       ],
+    );
+  }
+
+  Marker _buildMemberMarker(final UserModel member) {
+    return Marker(
+      point: LatLng(
+        member.lastLatitude!,
+        member.lastLongitude!,
+      ),
+      height: 40,
+      width: 40,
+      builder: (ctx) => CircleAvatar(
+        foregroundImage: _mapService.getMemberImage(member),
+      ),
     );
   }
 }

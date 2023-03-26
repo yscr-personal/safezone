@@ -11,7 +11,8 @@ import 'package:unb/common/cubits/websocket/websocket_cubit.dart';
 import 'package:unb/common/widgets/base_screen_layout.dart';
 import 'package:unb/common/widgets/loading_indicator.dart';
 import 'package:unb/modules/home/models/location_received_payload.dart';
-import 'package:unb/modules/home/widgets/osm_map.dart';
+import 'package:unb/modules/home/widgets/osm_map/osm_map.dart';
+import 'package:unb/modules/home/widgets/osm_map/osm_map_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,10 +22,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _logger = Modular.get<Logger>();
   final _groupCubit = Modular.get<GroupCubit>();
   final _authCubit = Modular.get<AuthCubit>();
   final _websocketCubit = Modular.get<WebsocketCubit>();
-  final _logger = Modular.get<Logger>();
+  final _mapService = Modular.get<MapService>();
   final _mapController = MapController();
 
   @override
@@ -53,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     return BaseScreenLayout(
+      overflowTop: true,
       child: BlocProvider.value(
         value: _groupCubit,
         child: SlidingUpPanel(
@@ -109,12 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ? Container()
               : ListTile(
                   leading: CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      'https://picsum.photos/${int.parse(member.id.substring(0, 2), radix: 16)}',
-                    ),
-                    // MemoryImage(
-                    //   base64Decode(member.profilePicture!),
-                    // ),
+                    backgroundImage: _mapService.getMemberImage(member),
                   ),
                   title: Text(member.name!),
                   subtitle: Text(member.email!),

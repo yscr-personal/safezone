@@ -26,6 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return BaseScreenLayout(
+      overflowTop: true,
       child: BlocProvider.value(
         value: _authCubit,
         child: BlocBuilder<AuthCubit, AuthState>(
